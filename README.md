@@ -348,18 +348,176 @@ Submit quiz answers for grading
 
 ## 🚀 Deployment
 
-### Deploy to Render
+### Deploy Frontend to Vercel
 
-1. Push code to GitHub
-2. Connect Render to your repository
-3. Use `render.yaml` for configuration
-4. Set environment variable: `HUGGINGFACE_TOKEN_API`
-5. Deploy!
+Vercel is perfect for the Next.js frontend with automatic deployments:
+
+#### Method 1: Using Vercel Dashboard (Recommended)
+
+1. **Push to GitHub** (already done!)
+   ```bash
+   # Your code is already at: https://github.com/madhava31/hackthon_star_Ai.git
+   ```
+
+2. **Go to Vercel**
+   - Visit [vercel.com](https://vercel.com)
+   - Sign up/Login with GitHub
+
+3. **Import Project**
+   - Click "New Project"
+   - Select your repository: `madhava31/hackthon_star_Ai`
+   - Vercel will auto-detect Next.js
+
+4. **Configure Project**
+   - **Framework Preset**: Next.js
+   - **Root Directory**: `fornt`
+   - **Build Command**: `npm run build` (auto-detected)
+   - **Output Directory**: `.next` (auto-detected)
+   - **Install Command**: `npm install` (auto-detected)
+
+5. **Deploy**
+   - Click "Deploy"
+   - Wait 2-3 minutes
+   - Get your live URL: `https://your-project.vercel.app`
+
+#### Method 2: Using Vercel CLI
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Navigate to frontend directory
+cd fornt
+
+# Deploy
+vercel
+
+# Follow the prompts:
+# - Set up and deploy: Y
+# - Which scope: (select your account)
+# - Link to existing project: N
+# - Project name: hackthon-star-ai
+# - Directory: ./
+# - Override settings: N
+
+# Production deployment
+vercel --prod
+```
+
+### Deploy Backend to Render
+
+Since Vercel is frontend-focused, deploy the FastAPI backend to Render:
+
+1. **Push to GitHub** (already done!)
+
+2. **Go to Render**
+   - Visit [render.com](https://render.com)
+   - Sign up/Login with GitHub
+
+3. **Create New Web Service**
+   - Click "New +" → "Web Service"
+   - Connect your repository: `madhava31/hackthon_star_Ai`
+
+4. **Configure Service**
+   - **Name**: `pdf-insight-backend`
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r req.txt`
+   - **Start Command**: `uvicorn app:app --host 0.0.0.0 --port $PORT`
+
+5. **Add Environment Variables**
+   - Click "Environment" tab
+   - Add: `HUGGINGFACE_TOKEN_API` = `your_token_here`
+
+6. **Deploy**
+   - Click "Create Web Service"
+   - Wait for deployment
+   - Get your backend URL: `https://pdf-insight-backend.onrender.com`
+
+7. **Update Frontend API URL**
+   - In `fornt/app/page.tsx`, update:
+   ```typescript
+   const API_BASE = "https://pdf-insight-backend.onrender.com";
+   ```
+   - Commit and push changes
+   - Vercel will auto-redeploy frontend
+
+### Alternative: Deploy Both Frontend & Backend to Vercel
+
+⚠️ **Important Limitations**: 
+- File size limit: 4.5 MB request body (your app supports 25 MB PDFs)
+- FAISS vector store resets on cold starts (stateless)
+- Execution timeout: 60s max (may fail for large PDFs)
+- Deployment size: 250 MB limit (ML libraries are large)
+
+**Recommended: Use Render for backend instead** (see above)
+
+#### If You Still Want Vercel for Everything:
+
+The project already includes:
+- `vercel.json` - Deployment configuration
+- `api/index.py` - Serverless handler
+- `api/requirements.txt` - Minimal dependencies
+
+**Steps:**
+
+1. **Update Frontend API URL**
+   
+   In `fornt/app/page.tsx`, change:
+   ```typescript
+   const API_BASE = "/api";  // Routes to Vercel serverless
+   ```
+
+2. **Add Environment Variable in Vercel**
+   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+   - Add: `HUGGINGFACE_TOKEN_API` = `your_token_here`
+
+3. **Deploy**
+   ```bash
+   vercel --prod
+   ```
+
+4. **Test Limitations**
+   - Try uploading PDFs < 4 MB
+   - If uploads fail, revert to Render for backend
+
+**Known Issues:**
+- Large PDFs (>4 MB) will fail
+- Vector index won't persist between requests
+- Cold starts may timeout on first request
 
 ### Environment Variables for Production
 ```env
+# Backend (Render)
 HUGGINGFACE_TOKEN_API=your_token_here
+
+# Frontend (Vercel)
+NEXT_PUBLIC_API_URL=https://pdf-insight-backend.onrender.com
 ```
+
+### Post-Deployment Checklist
+
+✅ Frontend deployed to Vercel  
+✅ Backend deployed to Render  
+✅ Environment variables configured  
+✅ API URL updated in frontend  
+✅ CORS enabled in backend (already done)  
+✅ Test file upload functionality  
+✅ Test chat feature  
+✅ Test quiz generation  
+✅ Check browser console for errors
+
+### Custom Domain (Optional)
+
+**Vercel Frontend:**
+1. Go to Project Settings → Domains
+2. Add your domain
+3. Update DNS records as shown
+
+**Render Backend:**
+1. Go to Service Settings → Custom Domain
+2. Add your domain
+3. Update DNS CNAME record
 
 ## 🤝 Contributing
 
@@ -391,6 +549,24 @@ This project is open source and available under the MIT License.
 - **Responsive Design**: Works beautifully on all screen sizes
 - **Fast & Efficient**: Turbopack for lightning-fast dev experience
 - **Type-Safe**: Full TypeScript implementation on frontend
+
+## 📝 Additional Notes
+
+- **Python Version**: Use Python 3.11.x in production. Render is configured via `.python-version` (3.11.9). Avoid Python 3.13 because `tokenizers` may require Rust build.
+- **Render Config**: Ensure `render.yaml` uses `buildCommand: pip install -r backend/req.txt` and `startCommand: cd backend && uvicorn app:app --host 0.0.0.0 --port $PORT`.
+- **Frontend Root**: When deploying to Vercel, set root directory to `fornt` (intentional folder name).
+- **API Base URL**: Update `API_BASE` in [fornt/app/page.tsx](fornt/app/page.tsx) to your backend URL (Render or other). For Vercel, you can use `NEXT_PUBLIC_API_URL` and read it in the frontend.
+- **Environment Variables**: Never commit secrets. Use `.env` locally and platform secrets in production.
+   - Backend: HUGGINGFACE_TOKEN_API
+   - Frontend: NEXT_PUBLIC_API_URL
+- **CORS**: Backend has permissive CORS enabled for development. For production, restrict allowed origins to your Vercel domain.
+- **File Limits**: Uploads are limited to ~25 MB for best performance. Large PDFs may increase processing time.
+- **Vector Store Persistence**: Current FAISS index is in-memory (or ephemeral in server). For persistent storage across deploys, attach a persistent disk/volume or external DB.
+- **Rate Limits**: HuggingFace endpoints can rate-limit. The app includes fallback retrieval-based answers if the LLM is unavailable.
+- **Logging**: `_log.txt` and debug files are ignored via `.gitignore`. Do not log sensitive data (tokens, user content).
+- **Line Endings**: Git may convert LF/CRLF on Windows; this is fine. Avoid committing platform-specific artifacts.
+- **Performance Tuning**: Adjust `chunk_size`, `chunk_overlap`, and embedding model in [backend/rag.py](backend/rag.py) for speed vs. accuracy trade-offs.
+- **Troubleshooting Builds**: If Render fails building `tokenizers`, relax strict pin in `req.txt` or stay on Python 3.11. Update pip if needed.
 
 ## 📞 Support
 
