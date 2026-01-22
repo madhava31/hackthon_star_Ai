@@ -2,6 +2,12 @@ services:
   - type: web
     name: pdf-insight-rag
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    region: oregon
     plan: free
+    buildCommand: pip install -r backend/req.txt
+    startCommand: cd backend && uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: HUGGINGFACE_TOKEN_API
+        sync: false
