@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
-const API_BASE = "http://127.0.0.1:8001";
+const API_BASE = "/api";
 
 // Loading Spinner Component
 function LoadingSpinner() {
