@@ -1,0 +1,116 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv*/
+venv311/
+env/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.env
+.venv
+
+# Backend specific
+backend/venv311/
+backend/__pycache__/
+backend/_log.txt
+backend/*.pyc
+backend/.pytest_cache/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+package-lock.json
+
+# Next.js
+.next/
+out/
+build
+dist
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.turbo
+
+# Frontend specific
+fornt/node_modules/
+fornt/.next/
+fornt/out/
+fornt/build/
+fornt/package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Test files
+test_*.py
+test_*.pdf
+*.test.js
+*.spec.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# User uploaded PDFs
+*.pdf
+
+# Database and cache
+*.db
+*.sqlite
+*.sqlite3
+.cache/
+
+# FAISS index files
+*.faiss
+*.pkl
+*.pickle
